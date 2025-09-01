@@ -1,0 +1,115 @@
+Objective 1: Data Prep & Q & A
+- Read in the AirBNB listing data (use low _memory =False and encoding='ISO-8859-1 in read csv)
+- Cast any data columns as a determine format - Filter down the data to just listings in the city of Paris
+- QA the Paris listings data: check for missing values, and calculate the minimum, maximum, and average for each numeric field
+
+
+import pandas as pd
+
+listings = pd.read_csv("Listings.csv", encoding="ISO-8859-1", low_memory=False,
+                      parse_dates=["host_since"])
+
+listings.head()
+
+paris_listings = (
+    listings
+    .query("city == 'Paris'")
+    .loc[:, ["host_since", "neighbourhood", "city", "accommodates", "price"]]
+)
+
+paris_listings.info()
+
+paris_listings.isna().sum()
+
+paris_listings.describe()
+
+paris_listings.query("price == 0 and accommodates == 0").count()
+
+
+
+ Objective 2: Prepare for Visualization
+- Create a DataFrame called paris_listings _neighbourhood.Group the Paris listings by neighbourhood and calculate the average price for each. Sort by price in acending ordeer.
+- Create a DataFrame called paris_listings_accomodations. Filter your data down to the most expensive neighbourhood in Paris. Group it by accomodates and calculate the average price for each. Sort by price in ascending order.
+- Finally, create a DataFrame  called paris_listings_over_time. Group the data by the year componet of host_since. Calculate a count of  rows to get the number of new hosts for each year, and the average price of listings each year.
+
+
+paris_listings_neighbourhood = ( 
+    paris_listings 
+    .groupby("neighbourhood")
+    .agg({"price": "mean"})
+    .sort_values("price")
+)
+paris_listings_neighbourhood.tail()
+
+paris_listings_accommodations =(
+     paris_listings
+    .query("neighbourhood =='Elysee'")
+    .groupby("accommodates")
+    .agg({"price": "mean"})
+    .sort_values("price")
+)
+
+paris_listings_accommodations.tail()
+
+paris_listings_over_time =(
+    paris_listings
+    .set_index("host_since")
+    .resample("YE")
+    #.groupby("host_since")
+    .agg({
+        "neighbourhood" : "count",
+        "price" : "mean"
+    })
+)
+paris_listings_over_time.head()    
+
+Objective 3: Visualize the Data
+- Build a horizantal bar chart of average rent price by neighnorhood. Which neighbourhoods stand out?
+- Build a horizantal bar chart of average price by accomodates in the most expensive neighbourhood. Are the rresults intuitive?
+- Finally, build the line charts of new hosts per year and average price by year. What happened to new hosts in 2015? Was average price impacted?
+
+
+
+import seaborn as sns
+
+(paris_listings_neighbourhood
+ .plot
+ .barh(
+     title = "Average Listing Price by Paris Neighbourhood",
+     xlabel = "Price Per Night (Euros)",
+     ylabel = "Neighbourhood",
+     legend=None
+ )
+)
+
+sns.despine()
+
+
+import seaborn as sns
+
+(paris_listings_accommodations
+ .plot
+ .barh(
+     title = "Average Listing Price by Paris by Accommodation Number",
+     xlabel = "Price Per Night (Euros)",
+     ylabel = "Accommodation Capacity",
+     legend=None
+ )
+)
+
+sns.despine()
+
+
+paris_listings_over_time ["neighbourhood"].plot(
+    ylabel="New Hosts",
+    title="New AirBnb Hots in Paris Over Time"
+)
+sns.despine
+
+paris_listings_over_time ["price"].plot(
+    ylabel="Average Price (Euros)",
+    title="Average AirBnb Paris Over Time"
+)
+
+sns.despine()
+
