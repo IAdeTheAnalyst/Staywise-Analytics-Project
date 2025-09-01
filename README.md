@@ -39,5 +39,5 @@ This project focuses on analyzing multiple datasets, including:
 ---
 
 ## 📈 Visual Previews  
-![Project Preview](screenshot.png)  
+![Project Preview](Screenshot%20Airbnb.png)  
 
